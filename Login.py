@@ -39,9 +39,14 @@ with ui.column().classes('items-center justify-center h-full w-full '):
             ).classes('flex-1 rounded-xl bg-white text-[#4a3c2a]')
            
 
-        # Sign Up Button
+        # Login Button
         ui.button('התחבר', on_click=lambda: ui.notify('!התחברת בהצלחה')).classes(
             'mt-4 bg-[#e0c9a6] hover:bg-[#cbb08c] text-[#4a3c2a] font-semibold rounded-xl px-4 py-2 w-full shadow-sm'
         )
 
+        # Forgot password link
+        with ui.row().classes('justify-center mt-2 w-full'):
+            ui.link('שכחתי סיסמה', '#').classes(
+                'text-sm text-[#6b5b4c] hover:text-[#d97706] hover:underline transition-colors duration-300'
+            )
 ui.run()
