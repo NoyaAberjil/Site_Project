@@ -9,11 +9,12 @@ with ui.column().classes('items-center justify-center h-full w-full '):
         'w-[450px] p-6 rounded-2xl shadow-md bg-[#f0ece1] border border-[#e8e2d8] overflow-hidden'
     ):
         with ui.row().classes('items-center justify-center mb-6'):
-            ui.image("logo3.jpg").classes(
-                'w-20 h-20 object-contain ml-3'
-            )
             ui.label('הרשמה').classes(
                 'text-3xl font-bold text-[#4a3c2a]'
+            )
+
+            ui.image("images/logo3.jpg").classes(
+                'w-20 h-20 object-contain ml-3'
             )
 
         # Tabs: Login / Signup
