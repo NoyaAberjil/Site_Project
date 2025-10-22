@@ -1,7 +1,6 @@
 from nicegui import ui
 import re
 
-
 @ui.page('/ForgatPassword',title="ForgatPassword",favicon='Images/logo3.jpg')
 def ForgatPassword_page():
     ui.add_head_html("<div dir=rtl>")
