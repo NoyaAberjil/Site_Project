@@ -6,14 +6,14 @@ class User(Document):
     id: str
     email: str  
     password: str
-    is_admin: bool = False
-    favorites: list[ObjectId] = []
+    is_admin: bool
+    favorites: list[ObjectId]
+    
+    def addFavorites(self, newRecipe):
+        if newRecipe not in self.favorites:
+            self.favorites.append(newRecipe)
+            self.save()
 
-
-def addManyUsers():
-    for i in range(20):
-        new_user = User(id="Michael"+str(i), email="Michael"+str(i)+"@gmail.com", password="Michael"+str(i))
-        new_user.save()
 
 
 def connect2DB():
