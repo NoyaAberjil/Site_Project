@@ -1,7 +1,6 @@
 from pymongo import MongoClient
 from bunnet import Document, init_bunnet
-from bson import ObjectId
-import datetime
+from datetime import datetime
 import gridfs
 
 class Recipe(Document):

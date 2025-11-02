@@ -1,6 +1,8 @@
 from DAL.recipe import Recipe
 from DAL.comments import Comments
-from  DAL.user import User
+from bunnet import init_bunnet
+from pymongo import MongoClient
+from DAL.user import User
 from bunnet import init_bunnet
 from pymongo import MongoClient
 from datetime import datetime 
@@ -8,10 +10,10 @@ from datetime import datetime
 
 def connect2db():
     print("connecting to DB...")
-    client = MongoClient("mongodb+srv://raz:raz@cluster0.mzxtq.mongodb.net/") #change to my account
-    init_bunnet(database=client.HT_3, document_models=[User,Recipe,Comments])
+    client = MongoClient("mongodb+srv://noya:aberjil@cluster0.zm00wso.mongodb.net/?appName=Cluster0") #change to my account
+    init_bunnet(database=client.CockBook, document_models=[User,Recipe,Comments])
     print("connected to DB.")
-    return client.HT_3
+    return client.CockBook
 
 def deleteUser(id):
     my_user = User.get(id).run()
@@ -19,27 +21,33 @@ def deleteUser(id):
     my_user.delete()
 
 def addRecipe(name, recipe):
-    new_recipe = Recipe(userName=name, recipe=recipe, rate=0.0, status="waiting", dop=datetime.datetime.now())
+    new_recipe = Recipe(userName=name, recipe=recipe, rate=0.0, status="waiting", dop=datetime.now())
     new_recipe.save()
 
-def addUser(id, email, password, is_admin=False, favorites=[]):
-    new_user = User(id, email, password, is_admin, favorites)
+def addUser(id, email, password, is_admin=False, favorites=None):
+    if favorites is None:
+        favorites = []
+    new_user = User(
+        id=id,
+        email=email,
+        password=password,
+        is_admin=is_admin,
+        favorites=favorites
+    )
     new_user.save()
 
 def addcomments(name, recipe_id, comment):
-    new_comment = Comments(userName=name, Recipe_ID=recipe_id, comment= comment, dop=datetime.datetime.now())
+    new_comment = Comments(userName=name, Recipe_ID=recipe_id, comment= comment, dop=datetime.now())
     new_comment.save()
 
 
 if __name__ == "__main__":
-    # Connect to the database
     db = connect2db()
-
     print("\n--- Testing functions ---")
 
     # 1️⃣ Test addUser
     print("\n>>> Adding a new user...")
-    addUser(id="12345", email="testuser@example.com", password="1234")
+    addUser(id="2345", email="testuser@example.com", password="1234")
     print("User added successfully.")
 
     # 2️⃣ Test addRecipe

@@ -1,10 +1,9 @@
-from pymongo import MongoClient
-from bunnet import Document, init_bunnet
-from bson import ObjectId
-import datetime
+from bunnet import Document
+# from bson import ObjectId
+from datetime import datetime
 
 class Comments(Document):
-    Recipe_ID: ObjectId
+    Recipe_ID: str
     userName: str
     comment: str  
     dop: datetime
