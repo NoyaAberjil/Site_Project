@@ -2,12 +2,21 @@ from pymongo import MongoClient
 from bunnet import Document, init_bunnet
 from datetime import datetime
 import gridfs
+from pydantic import BaseModel
 
+class recipeFilter(BaseModel):
+    difficulty: str
+    recipeType: str
+    
 class Recipe(Document):
     userName: str  
     recipe: str  
+    recipeName: str
+    ingredients: list[str]
     rate: float
     status: str  
+    difficulty : str
+    recipeType: str
     dop: datetime
     
     def changeStatus(self, newState):

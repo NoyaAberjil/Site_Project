@@ -1,5 +1,10 @@
 from pymongo import MongoClient
 from bunnet import Document, init_bunnet
+from pydantic import BaseModel
+
+class UserLogin(BaseModel):
+    user_name: str
+    password: str
 
 class User(Document):
     id: str
