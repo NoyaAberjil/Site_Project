@@ -1,6 +1,6 @@
 from fastapi import APIRouter,Response,status,UploadFile
 
-from DAL.user import User, UserLogin
+from DAL.user import User, UserLogin, AddFavoriteRequest
 
 router = APIRouter(prefix="/user")
 
@@ -72,36 +72,48 @@ def api_login(ul: UserLogin) :
         return Response(status_code=status.HTTP_404_NOT_FOUND)        
     else:
         return the_user
-# @router.post("/login")
-# def api_login(ul: UserLogin) :
-#     the_user:User = User.get(ul.user_name).run() 
-#     if the_user == None:
-#         return Response(status_code=status.HTTP_404_NOT_FOUND)
-#     elif the_user.password != ul.password:
-#         return Response(status_code=status.HTTP_404_NOT_FOUND)        
-#     else:
-#         return the_user
     
-    
-# add file for user
-@router.put("/file/{user_id}")
-def api_add_file(user_id: str,file: UploadFile):
-    the_user:User = User.get(user_id).run() 
-    if the_user == None:
-        return Response(status_code=status.HTTP_404_NOT_FOUND)
-    print("uploading file. size=",file.size)
-    the_user.add_file(file.file,file.content_type)
-
-# # get a file for user
-@router.get("/file/{user_id}")
-def api_get_file(user_id: str):
-    the_user:User = User.get(user_id).run() 
-    if the_user == None:
-        return Response(status_code=status.HTTP_404_NOT_FOUND)
-
-    f_data,media_type = the_user.get_file()
-    print(media_type)
-    if f_data == None:
+@router.post("/favorites")
+def api_favorites(ul:str):
+    the_user: User = User.get(ul).run()
+    if the_user is None:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     else:
-        return Response(content=f_data, media_type=media_type)
+        return {"favorites": the_user.favorites}
+    
+@router.post("/favorites/add")
+def add_favorite(req: AddFavoriteRequest):
+    the_user: User = User.get(req.user_name).run()
+
+    if the_user is None:
+        return Response(content="User not found", status_code=status.HTTP_404_NOT_FOUND)
+    
+    the_user.addFavorites(req.recipe_id)
+
+    return {
+        "message": f"Recipe {req.recipe_id} added to favorites.",
+        "favorites": the_user.favorites
+    }
+    
+# # add file for user
+# @router.put("/file/{user_id}")
+# def api_add_file(user_id: str,file: UploadFile):
+#     the_user:User = User.get(user_id).run() 
+#     if the_user == None:
+#         return Response(status_code=status.HTTP_404_NOT_FOUND)
+#     print("uploading file. size=",file.size)
+#     the_user.add_file(file.file,file.content_type)
+
+# # # get a file for user
+# @router.get("/file/{user_id}")
+# def api_get_file(user_id: str):
+#     the_user:User = User.get(user_id).run() 
+#     if the_user == None:
+#         return Response(status_code=status.HTTP_404_NOT_FOUND)
+
+#     f_data,media_type = the_user.get_file()
+#     print(media_type)
+#     if f_data == None:
+#         return Response(status_code=status.HTTP_404_NOT_FOUND)
+#     else:
+#         return Response(content=f_data, media_type=media_type)

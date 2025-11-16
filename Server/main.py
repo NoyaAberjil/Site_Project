@@ -6,6 +6,7 @@ import uvicorn
 import DAL.db
 from API.user import router as user_router
 from API.recipe import router as recipe_router
+from API.comments import router as comments_router
 # from api.task import router as task_router
 
 
@@ -16,98 +17,7 @@ else:
     app = FastAPI()
     app.include_router(user_router)
     app.include_router(recipe_router)
-
-# def connect2db():
-#     print("connecting to DB...")
-#     client = MongoClient("mongodb+srv://noya:aberjil@cluster0.zm00wso.mongodb.net/?appName=Cluster0") #change to my account
-#     init_bunnet(database=client.CockBook, document_models=[User,Recipe,Comments])
-#     print("connected to DB.")
-#     return client.CockBook
-
-# def deleteUser(id):
-#     my_user = User.get(id).run()
-#     print(my_user)
-#     my_user.delete()
-
-# def addRecipe(name, recipe):
-#     new_recipe = Recipe(userName=name, recipe=recipe, rate=0.0, status="waiting", dop=datetime.now())
-#     new_recipe.save()
-
-# def addUser(id, email, password, is_admin=False, favorites=None):
-#     if favorites is None:
-#         favorites = []
-#     new_user = User(
-#         id=id,
-#         email=email,
-#         password=password,
-#         is_admin=is_admin,
-#         favorites=favorites
-#     )
-#     new_user.save()
-
-# def addcomments(name, recipe_id, comment):
-#     new_comment = Comments(userName=name, Recipe_ID=recipe_id, comment= comment, dop=datetime.now())
-#     new_comment.save()
-
-
-# if __name__ == "__main__":
-#     db = connect2db()
-#     print("\n--- Testing functions ---")
-
-#     # 1️⃣ Test addUser
-#     print("\n>>> Adding a new user...")
-#     addUser(id="2345", email="testuser@example.com", password="1234")
-#     print("User added successfully.")
-
-#     # 2️⃣ Test addRecipe
-#     print("\n>>> Adding a new recipe...")
-#     addRecipe(name="testuser", recipe="Delicious chocolate cake 🍫")
-#     print("Recipe added successfully.")
-
-#     # 3️⃣ Test addcomments
-#     print("\n>>> Adding a comment to the recipe...")
-#     recipe = Recipe.find_one().run()
-#     if recipe:
-#         addcomments(name="testuser", recipe_id=recipe.id, comment="Looks really tasty 😋")
-#         print("Comment added successfully.")
-#     else:
-#         print("No recipe found to add a comment to.")
-
-#     # 4️⃣ Upload and download a photo for the recipe
-#     print("\n>>> Uploading a photo for the recipe...")
-#     if recipe:
-#         try:
-#             with open("test_photo.jpg", "rb") as file:
-#                 file_data = file.read()
-#                 recipe.add_file(db, file_data, content_type="image/jpeg")
-#             print("Photo uploaded successfully.")
-
-#             # Download the photo back
-#             file_data, content_type = recipe.get_file(db)
-#             if file_data:
-#                 with open("downloaded_photo.jpg", "wb") as output:
-#                     output.write(file_data)
-#                 print(f"Photo downloaded successfully as 'downloaded_photo.jpg' ({content_type})")
-#             else:
-#                 print("No photo found for this recipe.")
-#         except FileNotFoundError:
-#             print("⚠️ test_photo.jpg not found — please place an image file with that name in the same folder.")
-#     else:
-#         print("Skipping photo upload: no recipe found.")
-
-#     # 5️⃣ List all users
-#     print("\n>>> Listing all users:")
-#     users = User.find_all().run()
-#     for u in users:
-#         print(f"- {u.email} (id={u.id})")
-
-#     # 6️⃣ Test deleteUser
-#     print("\n>>> Deleting the test user...")
-#     deleteUser("12345")
-#     print("User deleted successfully.")
-
-#     print("\n--- Test completed ---")
-
+    app.include_router(comments_router)
 
 
 

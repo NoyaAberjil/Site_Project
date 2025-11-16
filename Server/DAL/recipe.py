@@ -14,6 +14,7 @@ class Recipe(Document):
     recipeName: str
     ingredients: list[str]
     rate: float
+    rated_user: list[str]
     status: str  
     difficulty : str
     recipeType: str
