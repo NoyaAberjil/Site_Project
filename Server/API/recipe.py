@@ -1,6 +1,7 @@
 from fastapi import APIRouter,Response,status,UploadFile
 from datetime import datetime
-from DAL.recipe import Recipe, recipeFilter
+from DAL.recipe import Recipe,recipeFilter
+# from DAL.recipe import Recipe, recipeFilter
 from DAL.user import User
 
 router = APIRouter(prefix="/recipe")
@@ -62,3 +63,25 @@ def api_change_rate(recipe_id: str, new_rate: float, user_id: str):
 
     recipe.save()
     return recipe
+
+# add file for recipe
+@router.put("/file/{recipe_id}")
+def api_add_file(recipe_id: str,file: UploadFile):
+    the_recipe:Recipe = Recipe.get(recipe_id).run() 
+    if the_recipe == None:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+    the_recipe.add_file(file.file,file.content_type)
+
+# get a file for recipe
+@router.get("/file/{recipe_id}")
+def api_get_file(recipe_id: str):
+    the_recipe:Recipe = Recipe.get(recipe_id).run() 
+    if the_recipe == None:
+        return Response("invalid recipe",status_code=status.HTTP_404_NOT_FOUND)
+
+    f_data,media_type = the_recipe.get_file()
+    print(media_type)
+    if f_data == None:
+        return Response("no file for recipe",status_code=status.HTTP_404_NOT_FOUND)
+    else:
+        return Response(content=f_data, media_type=media_type)
