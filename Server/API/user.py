@@ -4,16 +4,11 @@ from DAL.user import User, UserLogin, AddFavoriteRequest
 
 router = APIRouter(prefix="/user")
 
-
-# # find all users
+# find all users
 @router.get("/all")
 def api_get_all():
     return User.find().run()
 
-# # filter users
-# @router.post("/filter")
-# def api_get_filter(filter:UserFilter):
-#     return User.find_With_Filter(filter)
 
 # add user
 @router.post("")
@@ -41,7 +36,7 @@ def api_udpate(user: User):
         return user
 
 
-# # delete single user
+# delete user
 @router.delete("/{userName}")
 def api_delete(userName: str):
     the_user:User = User.get(userName).run() 
@@ -73,6 +68,7 @@ def api_login(ul: UserLogin) :
     else:
         return the_user
     
+# get favorites
 @router.post("/favorites/{userName}")
 def api_favorites(userName: str):
     the_user: User = User.get(userName).run()
@@ -80,7 +76,8 @@ def api_favorites(userName: str):
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     else:
         return {"favorites": the_user.favorites}
-    
+
+# add favorites
 @router.post("/favorites/add")
 def add_favorite(req: AddFavoriteRequest):
     the_user: User = User.get(req.user_name).run()
