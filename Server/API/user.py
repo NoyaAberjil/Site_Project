@@ -1,5 +1,5 @@
 from fastapi import APIRouter,Response,status,UploadFile
-
+from DAL.recipe import Recipe,recipeFilter
 from DAL.user import User, UserLogin, AddFavoriteRequest
 
 router = APIRouter(prefix="/user")
@@ -68,14 +68,6 @@ def api_login(ul: UserLogin) :
     else:
         return the_user
     
-# get favorites
-@router.post("/favorites/{userName}")
-def api_favorites(userName: str):
-    the_user: User = User.get(userName).run()
-    if the_user is None:
-        return Response(status_code=status.HTTP_404_NOT_FOUND)
-    else:
-        return {"favorites": the_user.favorites}
 
 # add favorites
 @router.post("/favorites/add")
@@ -85,10 +77,40 @@ def add_favorite(req: AddFavoriteRequest):
     if the_user is None:
         return Response(content="User not found", status_code=status.HTTP_404_NOT_FOUND)
     
+    the_recipe = Recipe.get(req.recipe_id).run()
+    if not the_recipe:
+        return Response(content="Recipe not found", status_code=status.HTTP_404_NOT_FOUND)
+    
     the_user.addFavorites(req.recipe_id)
 
     return {
         "message": f"Recipe {req.recipe_id} added to favorites.",
         "favorites": the_user.favorites
     }
+
+@router.post("/favorites/remove")
+def remove_favorite(req: AddFavoriteRequest):
+    the_user: User = User.get(req.user_name).run()
+
+    if the_user is None:
+        return Response(content="User not found", status_code=status.HTTP_404_NOT_FOUND)
+
+    if req.recipe_id in the_user.favorites:
+        the_user.favorites.remove(req.recipe_id)
+        the_user.save()
+
+    return {
+        "message": f"Recipe {req.recipe_id} removed from favorites.",
+        "favorites": the_user.favorites
+    }
+
     
+
+# get favorites
+@router.get("/favorites/{user_id}")
+def api_favorites(user_id: str):
+    the_user: User = User.get(user_id).run()  # מחפש לפי _id
+    if the_user is None:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+    return {"favorites": the_user.favorites}
+

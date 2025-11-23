@@ -85,3 +85,12 @@ def api_get_file(recipe_id: str):
         return Response("no file for recipe",status_code=status.HTTP_404_NOT_FOUND)
     else:
         return Response(content=f_data, media_type=media_type)
+
+@router.delete("/{recipe_id}")
+def api_delete_recipe(recipe_id: str):
+    recipe = Recipe.get(recipe_id).run()
+    if not recipe:
+        return Response(status_code=404, detail="Recipe not found")
+
+    recipe.delete()
+    return {"status": "Recipe deleted successfully"}
