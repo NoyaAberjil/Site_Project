@@ -14,8 +14,13 @@ def api_add(recipe: Recipe):
 
 # filter recipes
 @router.post("/filter")
-def api_get_filter(filter:recipeFilter):
-    return Recipe.find({'difficulty':filter.difficulty,'recipeType':filter.recipeType}).run()
+def api_get_filter(filter: recipeFilter):
+    return Recipe.find({
+        "difficulty": filter.difficulty,
+        "recipeType": filter.recipeType,
+        "status": "approved"
+    }).run()
+
 
 #get approved recipes
 @router.get("/approved")
