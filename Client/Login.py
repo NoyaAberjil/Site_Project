@@ -4,9 +4,16 @@ import Singup
 import ForgatPassword
 import PersonalPage
 import Recipe
+from requests import post
+from fastapi import status
 
-def login():
-    ui.navigate.to("/PersonalPage")
+def login(u, p):
+    data = {"user_name": u,"password": p}
+    response = post("http://127.0.0.1:8090/user/login",json=data)
+    if response.status_code == status.HTTP_200_OK:
+        ui.navigate.to("/PersonalPage")
+    else:
+        ui.notify("שם משתמש או סיסמה שגויים", color="red")
 
 @ui.page('/',title="Login",favicon='Images/logo3.jpg')
 def Login():
@@ -35,7 +42,7 @@ def Login():
 
             # First & Last name in one row
             with ui.row().classes('w-full mb-3'):
-                ui.input(placeholder="שם משתמש").classes('flex-1 rounded-xl bg-white text-[#4a3c2a]')
+                userName = ui.input(placeholder="שם משתמש").classes('flex-1 rounded-xl bg-white text-[#4a3c2a]')
 
             # Password
             with ui.row().classes('w-full mb-3'):
@@ -48,7 +55,7 @@ def Login():
             
 
             # Login Button
-            ui.button('התחבר', on_click=login).classes(
+            ui.button('התחבר', on_click=lambda: login(userName.value, password.value)).classes(
                 'mt-4 bg-[#e0c9a6] hover:bg-[#cbb08c] text-[#4a3c2a] font-semibold rounded-xl px-4 py-2 w-full shadow-sm'
             )
 

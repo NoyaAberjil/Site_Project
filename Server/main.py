@@ -19,19 +19,3 @@ else:
     app.include_router(recipe_router)
     app.include_router(comments_router)
 
-
-
-
-
-#example for sort in MDB
-# def findUsersByGender(gender):
-#     if gender =="":
-#         findresult = User.find() # find all documents
-#     else:
-#         findresult = User.find(User.gender==gender)
-#     return findresult.to_list()
-#     # for more search options, see: https://roman-right.github.io/bunnet/tutorial/finding-documents/#search-criteria
-#     # findresult = User.find(User.age>=12) # simple search
-#     # findresult = User.find(User.age>=12).sort(-User.name) # simple search with sort. use '-' or '+'
-#     # findresult = User.find(User.age>=12,User.age<15 ).sort(+User.age) # more than one search   
-#     # findresult = User.find(User.age>=12).limit(2) # with limit to the number of results
