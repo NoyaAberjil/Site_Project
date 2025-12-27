@@ -48,8 +48,8 @@ def Recipe_page():
                 # עמודה עם שני dropdowns
                 with ui.column().classes('gap-2'):
                     category_dropdown = ui.select(
-                        ['כל המתכונים', 'מתוק', 'מלוח', 'דיאטטי'],
-                        value='כל המתכונים',
+                        ['מתוק', 'מלוח', 'דיאטטי'],
+                        value='מתוק',
                         label='קטגוריה'
                     ).classes('w-48')
                     difficulty_dropdown = ui.select(

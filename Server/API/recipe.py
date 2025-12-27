@@ -1,8 +1,8 @@
 from fastapi import APIRouter,Response,status,UploadFile
 from datetime import datetime
-from DAL.recipe import Recipe,recipeFilter
 # from DAL.recipe import Recipe, recipeFilter
 from DAL.user import User
+from DAL.recipe import Recipe,recipeFilter
 
 router = APIRouter(prefix="/recipe")
 
@@ -15,11 +15,19 @@ def api_add(recipe: Recipe):
 # filter recipes
 @router.post("/filter")
 def api_get_filter(filter: recipeFilter):
-    return Recipe.find({
-        "difficulty": filter.difficulty,
-        "recipeType": filter.recipeType,
-        "status": "approved"
-    }).run()
+    query = {"status": "approved"}
+    if filter.difficulty != "":
+        query["difficulty"] = filter.difficulty
+
+    if filter.recipeType != "":
+        query["recipeType"] = filter.recipeType
+
+    return Recipe.find(query).run()
+    # return Recipe.find({
+    #     "difficulty": filter.difficulty,
+    #     "recipeType": filter.recipeType,
+    #     "status": "approved"
+    # }).run()
 
 
 #get approved recipes
