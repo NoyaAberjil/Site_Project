@@ -14,7 +14,7 @@ def Recipe_page():
     drawer = ui.drawer('left', bordered=True).classes('bg-[#f4f1ea] w-48')
     with drawer:
         ui.label('תפריט ראשי').classes('text-lg font-bold mb-4 text-[#4a3c2a]')
-        ui.button('בית', on_click=lambda: (app.storage.user.clear(),ui.navigate.to('/PersonalPage')).classes('block mb-2 text-[#4a3c2a]'))
+        ui.button('בית', on_click=lambda: (ui.navigate.to('/PersonalPage'))).classes('block mb-2 text-[#4a3c2a]')
         ui.button('התנתקות', on_click=logout).classes('block mb-2 text-[#4a3c2a]')
     with ui.row().classes('w-full bg-[#f0ece1] p-3 items-center shadow-md'):
         with ui.row().classes('flex-1 justify-start'):

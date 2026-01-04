@@ -67,7 +67,8 @@ def filter_recipes(container, recipe_type, difficulty):
     else:
         ui.notify("שגיאה בטעינת המתכונים", color="red")
 
-
+def load_favorite_recipes(container):
+    response = 1
 
 
 @ui.page('/PersonalPage', title="PersonalPage", favicon='Images/logo3.jpg')
@@ -83,7 +84,7 @@ def PersonalPage_page():
         ui.button('פרופיל',on_click=lambda: load_user_recipes(recipes_container)).classes('block mb-2 text-[#4a3c2a]')
         if app.storage.user.get("is_admin"):
             ui.button('מתכונים לאישור',on_click=lambda: load_admin_recipes(recipes_container)).classes('block mb-2 text-[#4a3c2a]')
-        ui.button('מועדפים',on_click=lambda: load_user_recipes(recipes_container)).classes('block mb-2 text-[#4a3c2a]')
+        ui.button('מועדפים',on_click=lambda: load_favorite_recipes(recipes_container)).classes('block mb-2 text-[#4a3c2a]')
         ui.button('הוספת מתכון', on_click=lambda: (ui.navigate.to('/Recipe'))).classes('block mb-2 text-[#4a3c2a]')
         ui.button('התנתקות', on_click=logout).classes('block mb-2 text-[#4a3c2a]')
 
