@@ -1,4 +1,4 @@
-from nicegui import ui
+from nicegui import ui, app
 import re
 from requests import post
 from fastapi import status
@@ -8,8 +8,11 @@ def singup(user, email, password, admin=False, favorite_recipes=[]):
     data = {"_id": user, "email": email, "password": password, "is_admin": admin, "favorites": favorite_recipes}
     response = post("http://127.0.0.1:8090/user",json=data)
     if response.status_code == status.HTTP_200_OK:
+        app.storage.user.update({"user_id":response.json()['_id']})
+        app.storage.user.update({"is_admin":response.json()['is_admin']})
         ui.navigate.to("/PersonalPage")
     else:
+        app.storage.user.clear()
         ui.notify("שם משתמש קיים", color="red")
 
 @ui.page('/Singup',title="Singup",favicon='Images/logo3.jpg')

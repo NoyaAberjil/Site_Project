@@ -1,4 +1,4 @@
-from nicegui import ui
+from nicegui import ui, app
 from requests import get, post
 from fastapi import status
 
@@ -9,7 +9,6 @@ def clear_cards(container):
 
 
 def update_recipe_cards(container, recipes):
-    """מעדכן את הכרטיסיות לפי רשימת מתכונים"""
     clear_cards(container)
 
     for i in range(0, len(recipes), 3):
@@ -39,6 +38,19 @@ def load_all_recipes(container):
     recipes = response.json() if response.status_code == status.HTTP_200_OK else []
     update_recipe_cards(container, recipes)
 
+def load_user_recipes(container):
+    response = get("http://127.0.0.1:8090/recipe/user/"+ app.storage.user.get("user_id"))
+    recipes = response.json() if response.status_code == status.HTTP_200_OK else []
+    update_recipe_cards(container, recipes)
+
+def load_admin_recipes(container):
+    response = get("http://127.0.0.1:8090/recipe/admin?user_id="+ app.storage.user.get("user_id"))
+    recipes = response.json() if response.status_code == status.HTTP_200_OK else []
+    update_recipe_cards(container, recipes)
+
+def logout():
+    app.storage.user.clear()
+    ui.navigate.to('/')
 
 def filter_recipes(container, recipe_type, difficulty):
     recipe_type_value = "" if recipe_type == "כל המתכונים" else recipe_type
@@ -63,6 +75,27 @@ def PersonalPage_page():
 
     ui.add_head_html("<div dir=rtl>")
     ui.query('body').classes('bg-[#f4f1ea]')
+
+    drawer = ui.drawer('left', bordered=True).classes('bg-[#f4f1ea] w-48')
+    with drawer:
+        ui.label('תפריט ראשי').classes('text-lg font-bold mb-4 text-[#4a3c2a]')
+        ui.button('בית',on_click=lambda: load_all_recipes(recipes_container)).classes('block mb-2 text-[#4a3c2a]')
+        ui.button('פרופיל',on_click=lambda: load_user_recipes(recipes_container)).classes('block mb-2 text-[#4a3c2a]')
+        if app.storage.user.get("is_admin"):
+            ui.button('מתכונים לאישור',on_click=lambda: load_admin_recipes(recipes_container)).classes('block mb-2 text-[#4a3c2a]')
+        ui.button('מועדפים',on_click=lambda: load_user_recipes(recipes_container)).classes('block mb-2 text-[#4a3c2a]')
+        ui.button('הוספת מתכון', on_click=lambda: (ui.navigate.to('/Recipe'))).classes('block mb-2 text-[#4a3c2a]')
+        ui.button('התנתקות', on_click=logout).classes('block mb-2 text-[#4a3c2a]')
+
+    with ui.row().classes('w-full bg-[#f0ece1] p-3 items-center shadow-md'):
+        with ui.row().classes('flex-1 justify-start'):
+            ui.icon('menu').classes('text-2xl cursor-pointer text-[#4a3c2a]').on('click', drawer.toggle)
+
+        with ui.row().classes('flex-1 justify-center'):
+            ui.image("Images/logo3.jpg").classes('w-16 h-16 object-contain')
+
+        with ui.row().classes('flex-1'):  
+            pass
 
     # ---------- Filters ----------
     with ui.row().classes('justify-center gap-4 w-full mt-4 mb-6'):

@@ -1,4 +1,4 @@
-from nicegui import ui
+from nicegui import ui, app
 import re
 import Singup
 import ForgatPassword
@@ -11,8 +11,11 @@ def login(u, p):
     data = {"user_name": u,"password": p}
     response = post("http://127.0.0.1:8090/user/login",json=data)
     if response.status_code == status.HTTP_200_OK:
+        app.storage.user.update({"user_id":response.json()['_id']})
+        app.storage.user.update({"is_admin":response.json()['is_admin']})
         ui.navigate.to("/PersonalPage")
     else:
+        app.storage.user.clear()
         ui.notify("שם משתמש או סיסמה שגויים", color="red")
 
 @ui.page('/',title="Login",favicon='Images/logo3.jpg')
@@ -64,4 +67,4 @@ def Login():
                 ui.link('שכחתי סיסמה', target='/ForgatPassword').classes(
                     'text-sm text-[#6b5b4c] hover:text-[#d97706] hover:underline transition-colors duration-300'
                 )
-ui.run()
+ui.run(storage_secret="topsecret")

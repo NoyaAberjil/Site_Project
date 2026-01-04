@@ -63,9 +63,9 @@ def test_recipe_filter():
     recipe2.status = "approved"
     recipe2.save()
 
-    # recipe3 = generate_recipe(user.id, "קל", "מתוק")       # pending
-    # recipe3.status = "pending"
-    # recipe3.save()
+    recipe3 = generate_recipe(user.id, "קל", "מתוק")       # pending
+    recipe3.status = "pending"
+    recipe3.save()
 
     recipe4 = generate_recipe(user.id, "קשה", "מלוח")      # approved
     recipe4.status = "approved"
@@ -79,11 +79,11 @@ def test_recipe_filter():
 
     assert all(r["status"] == "approved" and r["difficulty"] == "קל" and r["recipeType"] == "מתוק" for r in data)
 
-    # recipe1.delete()
-    # recipe2.delete()
-    # recipe3.delete()
-    # recipe4.delete()
-    # user.delete()
+    recipe1.delete()
+    recipe2.delete()
+    recipe3.delete()
+    recipe4.delete()
+    user.delete()
 
 def test_get_approved_recipes():
     user = generate_user(True)
