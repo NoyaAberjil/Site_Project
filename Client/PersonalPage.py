@@ -20,9 +20,9 @@ def update_recipe_cards(container, recipes):
                         with ui.card().classes('w-96 bg-[#ffffff] shadow-md p-4 rounded-xl cursor-pointer'):
                             ui.label(recipe['userName']).classes('text-lg font-bold text-[#4a3c2a] text-center')
                             ui.label(recipe['recipeName']).classes('text-sm text-[#6b5e4a] text-center mb-3')
-                            ui.image(f"http://127.0.0.1:8090/recipe/file/{recipe['_id']}").classes(
-                                'w-full object-contain rounded-lg mb-3'
-                            ).on("click", lambda: ui.navigate.to("/Recipe"))
+                            with ui.link(target= "/Recipe/"+recipe['_id']):
+                                # ui.image(f"http://127.0.0.1:8090/recipe/file/{recipe['_id']}").classes('w-full object-contain rounded-lg mb-3')
+                                ui.image(f"http://127.0.0.1:8090/recipe/file/{recipe['_id']}").classes('w-64')
 
                             with ui.row().classes('justify-between items-center w-full'):
                                 with ui.row().classes('gap-1'):
@@ -85,7 +85,8 @@ def PersonalPage_page():
         if app.storage.user.get("is_admin"):
             ui.button('מתכונים לאישור',on_click=lambda: load_admin_recipes(recipes_container)).classes('block mb-2 text-[#4a3c2a]')
         ui.button('מועדפים',on_click=lambda: load_favorite_recipes(recipes_container)).classes('block mb-2 text-[#4a3c2a]')
-        ui.button('הוספת מתכון', on_click=lambda: (ui.navigate.to('/Recipe'))).classes('block mb-2 text-[#4a3c2a]')
+        # ui.button('הוספת מתכון', on_click=lambda: (ui.navigate.to('/Recipe'))).classes('block mb-2 text-[#4a3c2a]')
+        ui.button('הוספת מתכון', on_click=lambda: (ui.navigate.to('/AddRecipe'))).classes('block mb-2 text-[#4a3c2a]')
         ui.button('התנתקות', on_click=logout).classes('block mb-2 text-[#4a3c2a]')
 
     with ui.row().classes('w-full bg-[#f0ece1] p-3 items-center shadow-md'):

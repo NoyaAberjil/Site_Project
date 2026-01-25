@@ -1,13 +1,14 @@
 from nicegui import ui, app
 from datetime import datetime
+from requests import get, post
 from PersonalPage import load_all_recipes, load_user_recipes, load_admin_recipes
 
 def logout():
     app.storage.user.clear()
     ui.navigate.to('/')
 
-@ui.page('/Recipe',title="Recipe",favicon='Images/logo3.jpg')
-def Recipe_page():
+@ui.page('/Recipe/{recipe_id}',title="Recipe",favicon='Images/logo3.jpg')
+def Recipe_page(recipe_id : str):
     ui.add_head_html("<div dir=rtl>")
     ui.query('body').classes('bg-[#f4f1ea]')
 
@@ -26,72 +27,51 @@ def Recipe_page():
 
     with ui.column().classes('items-center w-full mt-8'):
         with ui.card().classes('w-[600px] bg-white shadow-md rounded-xl p-6'):
+            if app.storage.user.get("is_admin"):
+                with ui.row().classes('justify-center gap-4 mb-4'):
+                    ui.button('אישור', color='green', icon='check').classes('px-4 py-2 text-white rounded-lg shadow-md')
+                    ui.button('דחייה', color='red', icon='close').classes('px-4 py-2 text-white rounded-lg shadow-md')
+                    
+            response = get(f"http://127.0.0.1:8090/recipe/id/{recipe_id}")
+            recipe = response.json()
 
-            # === כפתורי אישור ודחייה (למנהל) ===
-            with ui.row().classes('justify-center gap-4 mb-4'):
-                ui.button('אישור', color='green', icon='check').classes('px-4 py-2 text-white rounded-lg shadow-md')
-                ui.button('דחייה', color='red', icon='close').classes('px-4 py-2 text-white rounded-lg shadow-md')
-
-            # שורה עם דירוג (ימין), תמונה (מרכז), מועדפים (שמאל) + dropdowns בעמודה נוספת
             with ui.row().classes('items-center justify-between w-full'):
-                # דירוג
                 with ui.row().classes('gap-1'):
                     ui.rating(value=0, size="md").classes('material-icons text-yellow-500 cursor-pointer')
 
-                # תמונה
-                ui.image("https://tekoafarms.co.il/wp-content/uploads/2024/10/5-1-860x643.jpg").classes(
+                ui.image(f"http://127.0.0.1:8090/recipe/file/{recipe['_id']}").classes(
                     'w-64 h-48 object-cover rounded-lg'
                 )
 
-                # מועדפים
                 ui.chip(selectable=True, icon='bookmark', color='orange').classes(
                     'material-icons text-orange-500 cursor-pointer'
                 )
+            
+                with ui.column().classes('gap-1'):
+                    ui.label(f"קטגוריה: {recipe['recipeType']}").classes('text-md font-semibold text-[#4a3c2a]')
+                    ui.label(f"רמת קושי: {recipe['difficulty']}").classes('text-md font-semibold text-[#4a3c2a]')
 
-                # עמודה עם שני dropdowns
-                with ui.column().classes('gap-2'):
-                    category_dropdown = ui.select(
-                        ['מתוק', 'מלוח', 'דיאטטי'],
-                        value='מתוק',
-                        label='קטגוריה'
-                    ).classes('w-48')
-                    difficulty_dropdown = ui.select(
-                        ['קל', 'בינוני', 'קשה'],
-                        value='קל',
-                        label='רמת קושי'
-                    ).classes('w-48')
-
-            ui.label('שם המתכון').classes('text-xl font-bold text-[#4a3c2a] text-center mt-4')
+            
+            
+            ui.label(str(recipe['recipeName'])).classes('text-xl font-bold text-[#4a3c2a] text-center mt-4')
 
             ui.label('מצרכים:').classes('text-lg font-semibold text-[#4a3c2a] mt-4 mb-2')
-            ingredients = [
-                "2 כוסות קמח",
-                "1/2 כוס סוכר",
-                "3 ביצים",
-                "1/2 כוס שמן",
-                "1 כפית אבקת אפייה",
-                "1/2 כפית מלח",
-            ]
+            ingredients = recipe['ingredients']
             with ui.column().classes('gap-2'):
                 for item in ingredients:
                     ui.checkbox(item)
 
             ui.label('הוראות הכנה:').classes('text-lg font-semibold text-[#4a3c2a] mt-6 mb-2')
-            instructions = """1. מערבבים בקערה את כל המצרכים היבשים.
-    2. מוסיפים את הביצים והשמן ולשים עד קבלת בצק אחיד.
-    3. מניחים לנוח חצי שעה.
-    4. אופים בתנור שחומם מראש ל־180° במשך 25 דקות.
-    """
+            instructions = recipe['recipe']
             ui.label(instructions).classes('text-sm text-[#6b5e4a] whitespace-pre-line')
             
-            ui.button('העלה', color='#4a3c2a').classes('mt-6 px-6 py-2 text-white rounded-lg shadow-md')
 
         ui.label('תגובות').classes('text-xl font-bold text-[#4a3c2a] mt-8 mb-4')
 
         comments_column = ui.column().classes('w-[600px] gap-4')
         
         # שם משתמש קבוע בקוד
-        username = "נויה"
+        username = recipe['userName']
 
         def add_comment():
             text = comment_input.value.strip()

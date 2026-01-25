@@ -58,6 +58,11 @@ def api_get_admin_recipes(user_id: str):
 
     return Recipe.find({"status": "pending"}).run()
 
+# get recipe
+@router.get("/id/{recipe_id}")
+def api_get_recipe(recipe_id: str):
+    return Recipe.get(recipe_id).run()
+
 # change rate
 @router.post("/rate/{recipe_id}")
 def api_change_rate(recipe_id: str, new_rate: float, user_id: str):
