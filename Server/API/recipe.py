@@ -3,6 +3,7 @@ from datetime import datetime
 # from DAL.recipe import Recipe, recipeFilter
 from DAL.user import User
 from DAL.recipe import Recipe,recipeFilter
+from bson import ObjectId
 
 router = APIRouter(prefix="/recipe")
 
@@ -62,6 +63,15 @@ def api_get_admin_recipes(user_id: str):
 @router.get("/id/{recipe_id}")
 def api_get_recipe(recipe_id: str):
     return Recipe.get(recipe_id).run()
+
+#get favorite recipes
+@router.get("/favorites/{user_id}")
+def api_get_favorite_recipes(user_id: str):
+    user = User.get(user_id).run()
+    if not user:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+    ids = [ObjectId(x) for x in user.favorites]
+    return Recipe.find({"_id": {"$in": ids}}).run()
 
 # change rate
 @router.post("/rate/{recipe_id}")

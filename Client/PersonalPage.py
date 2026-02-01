@@ -27,7 +27,7 @@ def update_recipe_cards(container, recipes):
                             with ui.row().classes('justify-between items-center w-full'):
                                 with ui.row().classes('gap-1'):
                                     ui.rating(value=0, size="md")
-                                ui.chip(selectable=True, icon='bookmark', color='orange')
+                               
 
                             with ui.row().classes('justify-center items-center w-full'):
                                 ui.button('תגובות').classes('bg-[#e0c9a6] text-[#4a3c2a] rounded-lg px-4 py-1')
@@ -68,7 +68,9 @@ def filter_recipes(container, recipe_type, difficulty):
         ui.notify("שגיאה בטעינת המתכונים", color="red")
 
 def load_favorite_recipes(container):
-    response = 1
+    response = get("http://127.0.0.1:8090/recipe/favorites/"+ app.storage.user.get("user_id"))
+    recipes = response.json() if response.status_code == status.HTTP_200_OK else []
+    update_recipe_cards(container, recipes)
 
 
 @ui.page('/PersonalPage', title="PersonalPage", favicon='Images/logo3.jpg')
@@ -85,7 +87,6 @@ def PersonalPage_page():
         if app.storage.user.get("is_admin"):
             ui.button('מתכונים לאישור',on_click=lambda: load_admin_recipes(recipes_container)).classes('block mb-2 text-[#4a3c2a]')
         ui.button('מועדפים',on_click=lambda: load_favorite_recipes(recipes_container)).classes('block mb-2 text-[#4a3c2a]')
-        # ui.button('הוספת מתכון', on_click=lambda: (ui.navigate.to('/Recipe'))).classes('block mb-2 text-[#4a3c2a]')
         ui.button('הוספת מתכון', on_click=lambda: (ui.navigate.to('/AddRecipe'))).classes('block mb-2 text-[#4a3c2a]')
         ui.button('התנתקות', on_click=logout).classes('block mb-2 text-[#4a3c2a]')
 
