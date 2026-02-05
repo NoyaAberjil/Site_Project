@@ -26,7 +26,7 @@ def update_recipe_cards(container, recipes):
 
                             with ui.row().classes('justify-between items-center w-full'):
                                 with ui.row().classes('gap-1'):
-                                    ui.rating(value=0, size="md")
+                                    ui.rating(value=recipe['rate'], size="md", color="yellow").disable()
                                
 
                             with ui.row().classes('justify-center items-center w-full'):

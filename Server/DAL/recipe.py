@@ -9,6 +9,11 @@ class recipeFilter(BaseModel):
     difficulty: str
     recipeType: str
     
+class recipeRating(BaseModel):
+    new_rate: float
+    user_id: str
+    recipe_id: str
+    
 class Recipe(Document):
     userName: str  
     recipe: str  

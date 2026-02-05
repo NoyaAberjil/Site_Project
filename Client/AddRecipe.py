@@ -29,19 +29,12 @@ def Recipe_page():
         with ui.card().classes('w-[600px] bg-white shadow-md rounded-xl p-6'):
 
             with ui.row().classes('items-center justify-between w-full'):
-                with ui.row().classes('gap-1'):
-                    ui.rating(value=0, size="md").classes('material-icons text-yellow-500 cursor-pointer')
-
                 ui.image("https://tekoafarms.co.il/wp-content/uploads/2024/10/5-1-860x643.jpg").classes(
                     'w-64 h-48 object-cover rounded-lg'
                 )
 
-            
-                ui.chip(selectable=True, icon='bookmark', color='orange').classes(
-                    'material-icons text-orange-500 cursor-pointer'
-                )
 
-                # עמודה עם שני dropdowns
+
                 with ui.column().classes('gap-2'):
                     category_dropdown = ui.select(
                         ['מתוק', 'מלוח', 'דיאטטי'],

@@ -1,7 +1,8 @@
 from nicegui import ui, app
 from datetime import datetime
-from requests import get, post, delete
-from PersonalPage import load_all_recipes, load_user_recipes, load_admin_recipes
+from requests import get, post
+from fastapi import status
+
 
 
 def logout():
@@ -16,7 +17,25 @@ def on_favorite_toggle(value: bool, is_favorite: bool, recipe_id: str):
     elif not value and is_favorite:
         post("http://127.0.0.1:8090/user/favorites/remove", json=payload)
 
+def on_rate_change(e, recipe_id: str, rating_component, recipe):
+    payload = {
+        "new_rate": e.value,
+        "user_id": app.storage.user.get("user_id"),
+        "recipe_id": recipe_id
+    }
 
+    response = post("http://127.0.0.1:8090/recipe/rate", json=payload)
+
+    if response.status_code == status.HTTP_400_BAD_REQUEST:
+        ui.notify("כבר דירגת מתכון זה", color="red")
+        ui.navigate.to(f"/Recipe/{recipe_id}")
+        return
+
+    if response.status_code == status.HTTP_200_OK:
+        ui.navigate.to(f"/Recipe/{recipe_id}")
+
+
+        
 
 @ui.page('/Recipe/{recipe_id}', title="Recipe", favicon='Images/logo3.jpg')
 def Recipe_page(recipe_id: str):
@@ -69,10 +88,17 @@ def Recipe_page(recipe_id: str):
                     ui.button('דחייה', color='red', icon='close')
 
             with ui.row().classes('items-center justify-between w-full'):
-
+                already_rated = app.storage.user.get("user_id") in recipe['rated_user']
                 with ui.row().classes('gap-1'):
-                    ui.rating(value=0, size="md") \
-                        .classes('material-icons text-yellow-500 cursor-pointer')
+                    rating = ui.rating(
+                        value=round(recipe['rate']),
+                        size="md",
+                        color="yellow",
+                        on_change=lambda e: on_rate_change(e, recipe['_id'], rating, recipe),
+                    ).classes('material-icons text-yellow-500 cursor-pointer')
+                    if already_rated:
+                        rating.disable()
+
 
                 ui.image(
                     f"http://127.0.0.1:8090/recipe/file/{recipe['_id']}"

@@ -2,7 +2,7 @@ from fastapi import APIRouter,Response,status,UploadFile
 from datetime import datetime
 # from DAL.recipe import Recipe, recipeFilter
 from DAL.user import User
-from DAL.recipe import Recipe,recipeFilter
+from DAL.recipe import Recipe,recipeFilter,recipeRating
 from bson import ObjectId
 
 router = APIRouter(prefix="/recipe")
@@ -74,20 +74,20 @@ def api_get_favorite_recipes(user_id: str):
     return Recipe.find({"_id": {"$in": ids}}).run()
 
 # change rate
-@router.post("/rate/{recipe_id}")
-def api_change_rate(recipe_id: str, new_rate: float, user_id: str):
-    recipe = Recipe.get(recipe_id).run()
+@router.post("/rate")
+def api_change_rate(rating: recipeRating):
+    recipe = Recipe.get(rating.recipe_id).run()
 
     if recipe is None:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
-    if user_id in recipe.rated_user:
+    if rating.user_id in recipe.rated_user:
         return Response(status_code=status.HTTP_400_BAD_REQUEST)
 
     current_count = len(recipe.rated_user)
-    recipe.rate = (recipe.rate * current_count + new_rate) / (current_count + 1)
+    recipe.rate = (recipe.rate * current_count + rating.new_rate) / (current_count + 1)
 
-    recipe.rated_user.append(user_id)
+    recipe.rated_user.append(rating.user_id)
 
     recipe.save()
     return recipe
