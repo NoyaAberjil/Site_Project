@@ -13,7 +13,12 @@ class recipeRating(BaseModel):
     new_rate: float
     user_id: str
     recipe_id: str
-    
+
+class recipeStatus(BaseModel):
+    recipe_id: str
+    status: str
+
+   
 class Recipe(Document):
     userName: str  
     recipe: str  

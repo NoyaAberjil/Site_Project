@@ -27,10 +27,7 @@ def update_recipe_cards(container, recipes):
                             with ui.row().classes('justify-between items-center w-full'):
                                 with ui.row().classes('gap-1'):
                                     ui.rating(value=recipe['rate'], size="md", color="yellow").disable()
-                               
 
-                            with ui.row().classes('justify-center items-center w-full'):
-                                ui.button('תגובות').classes('bg-[#e0c9a6] text-[#4a3c2a] rounded-lg px-4 py-1')
 
 
 def load_all_recipes(container):

@@ -2,7 +2,7 @@ from fastapi import APIRouter,Response,status,UploadFile
 from datetime import datetime
 # from DAL.recipe import Recipe, recipeFilter
 from DAL.user import User
-from DAL.recipe import Recipe,recipeFilter,recipeRating
+from DAL.recipe import Recipe,recipeFilter,recipeRating, recipeStatus
 from bson import ObjectId
 
 router = APIRouter(prefix="/recipe")
@@ -88,6 +88,19 @@ def api_change_rate(rating: recipeRating):
     recipe.rate = (recipe.rate * current_count + rating.new_rate) / (current_count + 1)
 
     recipe.rated_user.append(rating.user_id)
+
+    recipe.save()
+    return recipe
+
+@router.post("/status")
+def api_change_rate(statusReq: recipeStatus):
+    recipe = Recipe.get(statusReq.recipe_id).run()
+
+    if recipe is None:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+
+
+    recipe.status = statusReq.status
 
     recipe.save()
     return recipe

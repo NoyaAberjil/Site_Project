@@ -1,6 +1,6 @@
 from nicegui import ui, app
 from datetime import datetime
-from requests import get, post
+from requests import get, post, delete
 from fastapi import status
 
 
@@ -34,6 +34,32 @@ def on_rate_change(e, recipe_id: str, rating_component, recipe):
     if response.status_code == status.HTTP_200_OK:
         ui.navigate.to(f"/Recipe/{recipe_id}")
 
+def on_approve_click(recipe_id):
+    payload = {"recipe_id": recipe_id, "status": 'approved'}
+    response = post("http://127.0.0.1:8090/recipe/status", json=payload)
+    if response.status_code == status.HTTP_200_OK:
+        ui.notify("המתכון אושר בהצלחה!", color="green")
+        ui.navigate.to(f"/Recipe/{recipe_id}")
+    else:
+        ui.notify("שגיאה באישור המתכון", color="red")
+
+def on_reject_click(recipe_id):
+    response = delete('http://127.0.0.1:8090/recipe/'+recipe_id)
+    if response.status_code == status.HTTP_200_OK:
+        ui.notify("המתכון נדחה ונמחק בהצלחה!", color="green")
+        ui.navigate.to('/PersonalPage')
+
+
+def render_comment(comment):
+    timestamp = datetime.fromisoformat(comment['dop']).strftime("%d/%m/%Y %H:%M")
+
+    with ui.card().classes(
+        'w-full bg-[#faf7f2] p-3 rounded-lg shadow-sm'
+    ):
+        ui.label(f"{comment['userName']} · {timestamp}") \
+            .classes('text-sm font-bold text-[#4a3c2a]')
+        ui.label(comment['comment']) \
+            .classes('text-sm text-[#6b5e4a]')
 
         
 
@@ -84,8 +110,8 @@ def Recipe_page(recipe_id: str):
             # ====== אישור אדמין ======
             if app.storage.user.get("is_admin") and 'pending' in recipe['status']:
                 with ui.row().classes('justify-center gap-4 mb-4'):
-                    ui.button('אישור', color='green', icon='check')
-                    ui.button('דחייה', color='red', icon='close')
+                    ui.button('אישור', color='green', icon='check', on_click=lambda: on_approve_click(recipe_id))
+                    ui.button('דחייה', color='red', icon='close', on_click=lambda: on_reject_click(recipe_id))
 
             with ui.row().classes('items-center justify-between w-full'):
                 already_rated = app.storage.user.get("user_id") in recipe['rated_user']
@@ -145,27 +171,58 @@ def Recipe_page(recipe_id: str):
             .classes('text-xl font-bold text-[#4a3c2a] mt-8 mb-4')
 
         comments_column = ui.column().classes('w-[600px] gap-4')
-        username = recipe['userName']
+        username = app.storage.user.get("user_id")
 
+        # --- טעינת תגובות מהשרת ---
+        def load_comments():
+            comments_column.clear()
+
+            response = get(f"http://127.0.0.1:8090/Comments/recipe/{recipe_id}")
+            if response.status_code != 200:
+                return
+
+            comments = response.json()
+
+            # מיון לפי זמן – ישן → חדש
+            comments.sort(key=lambda c: datetime.fromisoformat(c['dop']))
+
+            with comments_column:
+                for comment in comments:
+                    render_comment(comment)
+
+        load_comments()
+
+        # --- הוספת תגובה ---
         def add_comment():
             text = comment_input.value.strip()
-            if text:
-                timestamp = datetime.now().strftime("%d/%m/%Y %H:%M")
-                with comments_column:
-                    with ui.card().classes(
-                        'w-full bg-[#faf7f2] p-3 rounded-lg shadow-sm'
-                    ):
-                        ui.label(f"{username} · {timestamp}") \
-                            .classes('text-sm font-bold text-[#4a3c2a]')
-                        ui.label(text) \
-                            .classes('text-sm text-[#6b5e4a]')
-                comment_input.value = ''
+            if not text:
+                return
+
+            payload = {
+                "Recipe_ID": recipe_id,
+                "userName": username,
+                "comment": text,
+                "dop": datetime.now().isoformat()
+            }
+
+            response = post("http://127.0.0.1:8090/Comments/add", json=payload)
+            if response.status_code != 200:
+                ui.notify("שגיאה בהוספת תגובה", color="red")
+                return
+
+            new_comment = response.json()
+
+            with comments_column:
+                render_comment(new_comment)
+
+            comment_input.value = ''
 
         with ui.row().classes('w-[600px] gap-2 mt-2'):
             comment_input = ui.input(placeholder='הוסף תגובה...') \
                 .classes('flex-1')
             ui.button('שלח', on_click=add_comment) \
                 .classes('bg-[#4a3c2a] text-white rounded-lg px-4 py-2')
+
 
 
 
