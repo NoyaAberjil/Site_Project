@@ -41,10 +41,14 @@ def api_get_approved_recipes():
 def api_get_user_recipes():
     return Recipe.find().run()
 
-# get user recipes
+# get user approved recipes
 @router.get("/user/{user_name}")
 def api_get_user_recipes(user_name: str):
-    return Recipe.find({"userName": user_name}).run()
+    return Recipe.find({
+        "userName": user_name,
+        "status": "approved"
+    }).run()
+
 
 # get admin recipes
 @router.get("/admin")
