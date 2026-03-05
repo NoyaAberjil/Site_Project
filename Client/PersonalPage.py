@@ -76,7 +76,7 @@ def PersonalPage_page():
     ui.add_head_html("<div dir=rtl>")
     ui.query('body').classes('bg-[#f4f1ea]')
 
-    drawer = ui.drawer('left', bordered=True).classes('bg-[#f4f1ea] w-48')5
+    drawer = ui.drawer('left', bordered=True).classes('bg-[#f4f1ea] w-48')
     with drawer:
         ui.label('תפריט ראשי').classes('text-lg font-bold mb-4 text-[#4a3c2a]')
         ui.button('בית',on_click=lambda: load_all_recipes(recipes_container)).classes('block mb-2 text-[#4a3c2a]')

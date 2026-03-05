@@ -1,5 +1,7 @@
 from fastapi import APIRouter,Response,status,UploadFile
 from datetime import datetime
+
+from fastapi.responses import JSONResponse
 # from DAL.recipe import Recipe, recipeFilter
 from DAL.user import User
 from DAL.recipe import Recipe,recipeFilter,recipeRating, recipeStatus
@@ -10,6 +12,12 @@ router = APIRouter(prefix="/recipe")
 # add recipe
 @router.post("")
 def api_add(recipe: Recipe):
+    is_valid, error_message = recipe.validate_recipe()
+    if not is_valid:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"error": error_message}
+        )
     recipe.save()
     return recipe
 
@@ -24,11 +32,7 @@ def api_get_filter(filter: recipeFilter):
         query["recipeType"] = filter.recipeType
 
     return Recipe.find(query).run()
-    # return Recipe.find({
-    #     "difficulty": filter.difficulty,
-    #     "recipeType": filter.recipeType,
-    #     "status": "approved"
-    # }).run()
+
 
 
 #get approved recipes
