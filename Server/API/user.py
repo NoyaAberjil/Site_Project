@@ -1,4 +1,5 @@
 from fastapi import APIRouter,Response,status,UploadFile
+from fastapi.responses import JSONResponse
 from DAL.recipe import Recipe,recipeFilter
 from DAL.user import User, UserLogin, AddFavoriteRequest
 
@@ -14,7 +15,16 @@ def api_get_all():
 @router.post("")
 def api_add(user: User):
     if User.get(user.id).run() != None:
-        return Response(status_code=status.HTTP_400_BAD_REQUEST)
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            content={"error": "שם המשתמש כבר קיים במערכת"}
+        )
+    is_valid, error_message = user.validate_user()
+    if not is_valid:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            content={"error": error_message}
+        )    
     else:
         new_user = User(
         id=user.id,
@@ -113,4 +123,14 @@ def api_favorites(user_id: str):
     if the_user is None:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     return {"favorites": the_user.favorites}
+
+# forgot password
+@router.get("/forgot_pass/{user_id}")
+def api_forgot_pass(user_id: str):
+    the_user:User = User.get(user_id).run() 
+    if the_user == None:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+    else:
+        the_user.email_password()
+        return Response(status_code=status.HTTP_200_OK)
 

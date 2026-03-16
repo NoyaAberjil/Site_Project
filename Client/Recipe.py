@@ -192,10 +192,13 @@ def Recipe_page(recipe_id: str):
 
         load_comments()
 
-        # --- הוספת תגובה ---
+# --- הוספת תגובה ---
         def add_comment():
+            # ניקוי רווחים ובדיקת אורך מינימלי (יותר מתו אחד)
             text = comment_input.value.strip()
-            if not text:
+            
+            if len(text) < 1:
+                ui.notify("התגובה קצרה מדי, נא לכתוב לפחות תו אחד", color="orange")
                 return
 
             payload = {
@@ -205,24 +208,37 @@ def Recipe_page(recipe_id: str):
                 "dop": datetime.now().isoformat()
             }
 
-            response = post("http://127.0.0.1:8090/Comments/add", json=payload)
-            if response.status_code != 200:
-                ui.notify("שגיאה בהוספת תגובה", color="red")
-                return
+            try:
+                response = post("http://127.0.0.1:8090/Comments/add", json=payload)
+                
+                # הצלחה - הוספת התגובה למסך
+                if response.status_code == 200:
+                    new_comment = response.json()
+                    with comments_column:
+                        render_comment(new_comment)
+                    
+                    comment_input.value = ''  # ניקוי השדה
+                    ui.notify("התגובה נוספה בהצלחה", color="green")
 
-            new_comment = response.json()
+                # שגיאות ולידציה מה-Backend (מתכון/משתמש לא קיימים או תוכן לא תקין)
+                elif response.status_code in [400, 404]:
+                    error_msg = response.json().get("error", "שגיאה בנתונים")
+                    ui.notify(error_msg, color="red")
+                
+                else:
+                    ui.notify("חלה שגיאה בשרת, נסה שוב", color="red")
 
-            with comments_column:
-                render_comment(new_comment)
+            except Exception as e:
+                ui.notify(f"שגיאת תקשורת: {str(e)}", color="red")
 
-            comment_input.value = ''
-
-        with ui.row().classes('w-[600px] gap-2 mt-2'):
+        # עיצוב שורת הקלט
+        with ui.row().classes('w-[600px] gap-2 mt-2 items-center'):
             comment_input = ui.input(placeholder='הוסף תגובה...') \
-                .classes('flex-1')
+                .classes('flex-1 bg-white rounded-lg px-3') \
+                .on('keydown.enter', add_comment) # מאפשר שליחה גם בלחיצה על Enter
+            
             ui.button('שלח', on_click=add_comment) \
-                .classes('bg-[#4a3c2a] text-white rounded-lg px-4 py-2')
-
+                .classes('bg-[#4a3c2a] text-white rounded-lg px-6 py-2 shadow-sm hover:bg-[#5d4d3b]')
 
 
 

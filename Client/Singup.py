@@ -11,9 +11,14 @@ def singup(user, email, password, admin=False, favorite_recipes=[]):
         app.storage.user.update({"user_id":response.json()['_id']})
         app.storage.user.update({"is_admin":response.json()['is_admin']})
         ui.navigate.to("/PersonalPage")
+    elif response.status_code == status.HTTP_400_BAD_REQUEST:
+            # כאן אנחנו שולפים את הודעת השגיאה המדויקת מה-Backend
+            error_msg = response.json().get("error", "שגיאה בנתונים")
+            app.storage.user.clear()
+            ui.notify(error_msg, color="red", position="top")
+            
     else:
-        app.storage.user.clear()
-        ui.notify("שם משתמש קיים", color="red")
+            ui.notify("שגיאה בחיבור לשרת", color="red")
 
 @ui.page('/Singup',title="Singup",favicon='Images/logo3.jpg')
 def singup_page():

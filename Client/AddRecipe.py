@@ -26,6 +26,9 @@ async def upload_file(recipe_id):
         files = {"file": (file_name , file_content, content_type)})
 
 async def on_add_recipe_click(recipe_name_input, recipe, ing, category_dropdown, difficulty_dropdown, file_input):
+    if not recipe_name_input or not recipe or not ing:
+        ui.notify("נא למלא את כל השדות החובה", color="orange")
+        return
     recipe_data = {
     "userName": app.storage.user.get("user_id"),  
     "recipe":  recipe ,
@@ -48,14 +51,16 @@ async def on_add_recipe_click(recipe_name_input, recipe, ing, category_dropdown,
             ui.notify('please wait while uploading the file...')
             await upload_file(recipe_id)
             ui.notify("המתכון נוסף בהצלחה!", color="green")
-            ui.navigate.to('/PersonalPage')           
+            ui.navigate.to('/PersonalPage')  
+
+    elif response.status_code == status.HTTP_400_BAD_REQUEST:
+            # כאן תוצג השגיאה שכתבנו ב-Backend (למשל: "רמת קושי לא תקינה")
+            error_msg = response.json().get("error", "שגיאה בנתונים")
+            ui.notify(error_msg, color="red", position="top")     
+
     else:
-        ui.notify('invalid data')
+        ui.notify(f"שגיאה בהעלת נתונים", color="red")
 
-
-
-    ui.notify("המתכון נוסף בהצלחה!", color="green")
-    ui.navigate.to('/PersonalPage')
 
 
 @ui.page('/AddRecipe', title="AddRecipe", favicon='Images/logo3.jpg')
