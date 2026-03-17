@@ -31,9 +31,11 @@ class User(Document):
         
         if len(self.password) < 4:
             return False, "הסיסמה חייבת להכיל לפחות 4 תווים"
-        
             
         return True, ""
+    def email_password(self):
+        conn = SMTP('noyaaberjil@gmail.com',oauth2_file='C:\\Users\\Cyber_User\\Documents\\Site_Project\\Server\\client_secret_cookbook.json')
+        conn.send(to=self.email,subject="your password",contents="your password is:"+self.password)
 
     def addFavorites(self, newRecipe):
         if newRecipe not in self.favorites:
