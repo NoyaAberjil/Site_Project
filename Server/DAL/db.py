@@ -5,7 +5,7 @@ from functools import lru_cache
 @lru_cache()
 def get_db():    
     print("connecting to DB...")
-    client = MongoClient("mongodb+srv://noya:aberjil@cluster0.zm00wso.mongodb.net/?appName=Cluster0") 
+    client = MongoClient("mongodb+srv://noyaaberjil_db_user:SwLY9W2VAjStssIT@cluster0.zxasbcw.mongodb.net/") 
     print("connected to DB.")
     return client.CockBook
 
